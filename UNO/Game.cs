@@ -90,7 +90,7 @@
                     ConsoleColor.Red, ConsoleColor.Yellow,
                     ConsoleColor.Green, ConsoleColor.Blue,
                     ConsoleColor.Cyan, ConsoleColor.Magenta,
-                    ConsoleColor.DarkRed, ConsoleColor.DarkYellow,
+                    ConsoleColor.DarkRed, ConsoleColor.DarkYellow
                 }, false);
 
             Deck allWild = CreateDeck("All Wild",
@@ -99,13 +99,7 @@
                     "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild"
                 },
                 new string[] { "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild" },
-                new ConsoleColor[]
-                {
-                    ConsoleColor.Red, ConsoleColor.Yellow,
-                    ConsoleColor.Green, ConsoleColor.Blue,
-                    ConsoleColor.Cyan, ConsoleColor.Magenta,
-                    ConsoleColor.DarkRed, ConsoleColor.DarkYellow,
-                }, false);
+                commonColors, false);
 
             return new Deck[] { standard, competitive, candy, chaos, allWild };
         }
