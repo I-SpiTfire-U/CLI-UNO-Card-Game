@@ -430,7 +430,7 @@
 
             if (card.Type.Contains('x'))
             {
-                repeatValue = Convert.ToInt32(card.Type.Split('x')[0]);
+                repeatValue = Convert.ToInt32(card.Type.Split('x')[1]);
             }
 
             for (int i = 0; i < repeatValue; i++)
