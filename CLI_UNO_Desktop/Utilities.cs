@@ -1,4 +1,4 @@
-﻿namespace UNO
+﻿namespace CLI_UNO_Desktop
 {
     public static class Utilities
     {
