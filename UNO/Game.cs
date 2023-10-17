@@ -486,7 +486,7 @@
         /// <param name="card">The selected card</param>
         private static void HandleDrawingActions(Card card)
         {
-            int drawValue = Convert.ToInt32(card.Type.Split('+')[0]);
+            int drawValue = Convert.ToInt32(card.Type.Split('+')[1]);
 
             if (card.Type.Contains("self"))
             {
