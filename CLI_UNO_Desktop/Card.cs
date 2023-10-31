@@ -10,10 +10,5 @@
             Color = color;
             Type = type;
         }
-
-        public override string ToString()
-        {
-            return $"{Color} {Type}";
-        }
     }
 }

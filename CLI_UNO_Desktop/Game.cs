@@ -2,8 +2,6 @@
 {
     internal class Game
     {
-        #region // Variable Init
-
 #pragma warning disable CS8618
         private static Deck _ActiveDeck;
 #pragma warning restore CS8618
@@ -11,11 +9,9 @@
         private static int _CurrentTurn;
         private static Card _CurrentDiscard;
         private static int _NextPlayerPickup = 0;
-        private static bool _Reverse = false;
+        private static bool _ReversePlayDirection = false;
         private static readonly Random _Random = new();
-        private static readonly List<List<Card>> _Players = new();
-
-        #endregion
+        private static readonly List<List<Card>> _PlayerList = new();
 
         private static void Main()
         {
@@ -41,33 +37,33 @@
         {
             ConsoleColor[] commonColors = new ConsoleColor[] { ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Blue };
 
-            Deck standard = CreateDeck("Standard",
-                new string[]
+            Deck standard = new Deck("Standard",
+                new HashSet<string>
                 {
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "skip", "reverse", "draw +2", "wild", "wild +4", "wild shuffle"
                 },
-                new string[]
+                new HashSet<string>
                 { "wild", "wild +4", "wild shuffle" },
                 commonColors, false);
 
-            Deck competitive = CreateDeck("Competitive",
-                new string[]
+            Deck competitive = new Deck("Competitive",
+                new HashSet<string>
                 {
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "reverse", "draw +1", "draw +2", "wild", "wild shuffle", "self draw +2", "self draw +3",
                 },
-                new string[]
+                new HashSet<string>
                 { "wild", "wild shuffle", "self draw +2", "self draw +3" },
                 commonColors, false);
 
-            Deck candy = CreateDeck("Candy",
-                new string[]
+            Deck candy = new Deck("Candy",
+                new HashSet<string>
                 {
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "skip", "reverse", "draw +1", "draw +2", "wild", "wild +4", "candy"
                 },
-                new string[]
+                new HashSet<string>
                 { "wild", "wild +4", "candy" },
                 new ConsoleColor[]
                 {
@@ -76,14 +72,14 @@
                     ConsoleColor.Cyan, ConsoleColor.Magenta
                 }, false);
 
-            Deck chaos = CreateDeck("Chaos",
-                new string[]
+            Deck chaos = new Deck("Chaos",
+                new HashSet<string>
                 {
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "skip", "skip x2", "reverse", "draw +1", "draw +2", "draw +4", "draw +8", "draw +50", "wild", "wild +2",
                     "wild +4", "wild +8", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild", "candy"
                 },
-                new string[]
+                new HashSet<string>
                 { "wild", "wild +2", "wild +4", "wild +8", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild", "candy" },
                 new ConsoleColor[]
                 {
@@ -93,29 +89,25 @@
                     ConsoleColor.DarkRed, ConsoleColor.DarkYellow
                 }, false);
 
-            Deck allWild = CreateDeck("All Wild",
-                new string[]
+            Deck allWild = new Deck("All Wild",
+                new HashSet<string>
                 {
                     "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild"
                 },
-                new string[] { "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild" },
+                new HashSet<string> { "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild" },
                 commonColors, false);
 
-            return new Deck[] { standard, competitive, candy, chaos, allWild };
-        }
+            Deck retro = new Deck("Retro",
+                new HashSet<string>
+                {
+                    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                    "skip", "reverse", "draw +2", "wild", "wild +4", "wild shuffle"
+                },
+                new HashSet<string> { },
+                new ConsoleColor[]
+                { ConsoleColor.Green, ConsoleColor.DarkGreen }, false);
 
-        /// <summary>
-        /// Creates and returns a new Deck
-        /// </summary>
-        /// <param name="name">Name of the deck</param>
-        /// <param name="cardTypes">All of the card types</param>
-        /// <param name="specialCardTypes">Any of the special cards like wilds</param>
-        /// <param name="colors">What colors the deck contains</param>
-        /// <param name="disableWild">Whether the wild card functionality is disabled</param>
-        /// <returns>A new deck</returns>
-        private static Deck CreateDeck(string name, string[] cardTypes, string[] specialCardTypes, ConsoleColor[] colors, bool disableWild)
-        {
-            return new Deck(name, new HashSet<string>(cardTypes), new HashSet<string>(specialCardTypes), colors, disableWild);
+            return new Deck[] { standard, competitive, candy, chaos, allWild, retro };
         }
 
         /// <summary>
@@ -124,30 +116,30 @@
         /// <param name="decks">The available deck options</param>
         private static void GameSetup(Deck[] decks)
         {
-            int deckChoice;
+            int deckChoice = -1;
             for (int i = 0; i < decks.Length; i++)
             {
                 Console.WriteLine($"[{i}] {decks[i].Name}");
             }
-            do
+
+            while (deckChoice < 0 || deckChoice >= decks.Length)
             {
-                deckChoice = Utilities.Prompt("Choose a deck: ", "That is not a choice!");
+                deckChoice = Prompt("Choose a deck: ", "That is not a choice!");
             }
-            while (deckChoice < 0 || deckChoice >= decks.Length);
             _ActiveDeck = decks[deckChoice];
 
-            int startingHand = Utilities.Prompt("# of cards: ", "That is not a number!");
-            _NumberOfPlayers = Utilities.Prompt("# of players: ", "That is not a number!");
+            int startingHand = Prompt("# of cards: ", "That is not a number!");
+            _NumberOfPlayers = Prompt("# of players: ", "That is not a number!");
 
             _CurrentTurn = _Random.Next(_NumberOfPlayers);
 
-            _Players.Clear();
+            _PlayerList.Clear();
             for (int i = 0; i < _NumberOfPlayers; i++)
             {
-                _Players.Add(new List<Card>(startingHand));
+                _PlayerList.Add(new List<Card>(startingHand));
                 for (int j = 0; j < startingHand; j++)
                 {
-                    _Players[i].Add(_ActiveDeck.GetRandomCard());
+                    _PlayerList[i].Add(_ActiveDeck.GetRandomCard());
                 }
             }
 
@@ -199,13 +191,13 @@
         /// <returns>Whether a player won</returns>
         private static bool CheckForPlayerWins()
         {
-            for (int i = 0; i < _Players.Count; i++)
+            for (int i = 0; i < _PlayerList.Count; i++)
             {
-                if (_Players[i].Count <= 0)
+                if (_PlayerList[i].Count <= 0)
                 {
                     Console.Clear();
                     Console.WriteLine("\x1b[3J");
-                    Utilities.WriteLineColor($"\nPlayer {i} wins!", ConsoleColor.Cyan);
+                    WriteLineColor($"\nPlayer {i} wins!", ConsoleColor.Cyan);
                     _ = Console.ReadKey(true);
                     return true;
                 }
@@ -219,14 +211,7 @@
         /// <returns>Whether a player has lost their turn</returns>
         private static bool AdjustTurn()
         {
-            if (_Reverse)
-            {
-                _CurrentTurn--;
-            }
-            else
-            {
-                _CurrentTurn++;
-            }
+            _CurrentTurn += _ReversePlayDirection ? -1 : 1;
 
             if (_CurrentTurn < 0)
             {
@@ -241,7 +226,7 @@
             {
                 for (int i = 0; i < _NextPlayerPickup; i++)
                 {
-                    _Players[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
+                    _PlayerList[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
                 }
                 _NextPlayerPickup = 0;
                 return true;
@@ -258,32 +243,28 @@
             Console.WriteLine("\x1b[3J");
             Console.Write("-----------------------" +
                           "\nDiscard Pile: ");
-            Utilities.WriteLineColor(_CurrentDiscard.Type, _CurrentDiscard.Color);
-            char direction = _Reverse ? '<' : '>';
+            WriteLineColor(_CurrentDiscard.Type, _CurrentDiscard.Color);
+            char direction = _ReversePlayDirection ? '<' : '>';
             Console.WriteLine($"Current Direction: {direction}\n" +
                               $"-----------------------");
 
             // Prints out each player and how many cards they have left
-            Utilities.WriteLineColor("\nPlayer List:", ConsoleColor.Cyan);
+            WriteLineColor("\nPlayer List:", ConsoleColor.Cyan);
             Console.WriteLine("-------------");
-            for (int i = 0; i < _Players.Count; i++)
+            for (int i = 0; i < _PlayerList.Count; i++)
             {
-                if (i == _CurrentTurn)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                }
-                Console.WriteLine($"Player {i} : Cards {_Players[i].Count}");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = i == _CurrentTurn ? ConsoleColor.Green : ConsoleColor.White;
+                Console.WriteLine($"Player {i} : Cards {_PlayerList[i].Count}");
             }
 
             // Prints out main players hand
-            Utilities.WriteLineColor("\nYour Cards:", ConsoleColor.Cyan);
+            WriteLineColor("\nYour Cards:", ConsoleColor.Cyan);
             Console.WriteLine("------------");
             Console.WriteLine("[-1] Pick Up\n");
-            for (int i = 0; i < _Players[0].Count; i++)
+            for (int i = 0; i < _PlayerList[0].Count; i++)
             {
                 Console.Write($"[{i}] ");
-                Utilities.WriteLineColor($"{_Players[0][i].Type}", _Players[0][i].Color);
+                WriteLineColor($"{_PlayerList[0][i].Type}", _PlayerList[0][i].Color);
             }
         }
 
@@ -304,22 +285,22 @@
                 Console.Write("Pick a card: ");
                 if (!TryGetValidUserChoice(out int choice))
                 {
-                    Utilities.WriteLineColor("That is not a valid option!", ConsoleColor.Red);
+                    WriteLineColor("That is not a valid option!", ConsoleColor.Red);
                 }
 
                 if (choice == -1)
                 {
-                    _Players[0].Add(_ActiveDeck.GetRandomCard());
+                    _PlayerList[0].Add(_ActiveDeck.GetRandomCard());
                     return;
                 }
 
-                selectedCard = _Players[0][choice];
+                selectedCard = _PlayerList[0][choice];
 
                 if (IsValidMove(selectedCard))
                 {
                     break;
                 }
-                Utilities.WriteLineColor("That is not a valid option!", ConsoleColor.Red);
+                WriteLineColor("That is not a valid option!", ConsoleColor.Red);
             }
 
             PlayCard(selectedCard);
@@ -333,7 +314,7 @@
         /// <returns>Whether the index is valid or not</returns>
         private static bool TryGetValidUserChoice(out int choice)
         {
-            if (!int.TryParse(Console.ReadLine(), out choice) || choice < -1 || choice >= _Players[0].Count)
+            if (!int.TryParse(Console.ReadLine(), out choice) || choice < -1 || choice >= _PlayerList[0].Count)
             {
                 choice = -1;
                 return false;
@@ -352,10 +333,10 @@
         {
             Thread.Sleep(2500);
 
-            ShuffleBotHand(_Players[_CurrentTurn]);
+            ShuffleBotHand(_PlayerList[_CurrentTurn]);
 
             // Randomly selects a card from the bots hand
-            foreach (Card card in _Players[_CurrentTurn])
+            foreach (Card card in _PlayerList[_CurrentTurn])
             {
                 if (IsValidMove(card))
                 {
@@ -364,7 +345,7 @@
                 }
             }
 
-            _Players[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
+            _PlayerList[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
             Console.Clear();
         }
 
@@ -393,7 +374,7 @@
         /// <param name="selectedCard">The card that the player selected</param>
         private static void PlayCard(Card selectedCard)
         {
-            _ = _Players[_CurrentTurn].Remove(selectedCard);
+            _ = _PlayerList[_CurrentTurn].Remove(selectedCard);
             _CurrentDiscard = selectedCard;
             UseCard(selectedCard);
         }
@@ -445,7 +426,7 @@
         {
             if (card.Type.Contains("reverse"))
             {
-                _Reverse = !_Reverse;
+                _ReversePlayDirection = !_ReversePlayDirection;
             }
 
             if (card.Type.Contains("wild") && !_ActiveDeck.DisableWild)
@@ -470,7 +451,7 @@
 
             if (card.Type.Contains("skip"))
             {
-                _CurrentTurn += _Reverse ? -1 : 1;
+                _CurrentTurn += _ReversePlayDirection ? -1 : 1;
             }
         }
 
@@ -504,7 +485,7 @@
             int index = 0;
             List<Card> totalCards = new();
 
-            foreach (List<Card> hand in _Players)
+            foreach (List<Card> hand in _PlayerList)
             {
                 totalCards.AddRange(hand);
                 hand.Clear();
@@ -512,7 +493,7 @@
 
             foreach (Card c in totalCards)
             {
-                _Players[index].Add(c);
+                _PlayerList[index].Add(c);
                 index++;
                 if (index == _NumberOfPlayers)
                 {
@@ -543,14 +524,14 @@
                 while (target == _CurrentTurn);
             }
 
-            attackerCards = _Players[_CurrentTurn].ToArray();
-            targetCards = _Players[target].ToArray();
+            attackerCards = _PlayerList[_CurrentTurn].ToArray();
+            targetCards = _PlayerList[target].ToArray();
 
-            _Players[_CurrentTurn].Clear();
-            _Players[target].Clear();
+            _PlayerList[_CurrentTurn].Clear();
+            _PlayerList[target].Clear();
 
-            _Players[_CurrentTurn] = targetCards.ToList();
-            _Players[target] = attackerCards.ToList();
+            _PlayerList[_CurrentTurn] = targetCards.ToList();
+            _PlayerList[target] = attackerCards.ToList();
         }
 
         /// <summary>
@@ -561,7 +542,7 @@
         {
             for (int i = 0; i < drawValue; i++)
             {
-                _Players[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
+                _PlayerList[_CurrentTurn].Add(_ActiveDeck.GetRandomCard());
             }
             _CurrentDiscard.Color = _ActiveDeck.GetRandomColor();
         }
@@ -575,7 +556,7 @@
             int target = GetTargetPlayer();
             for (int i = 0; i < pickupAmount; i++)
             {
-                _Players[target].Add(_ActiveDeck.GetRandomCard());
+                _PlayerList[target].Add(_ActiveDeck.GetRandomCard());
             }
             _CurrentDiscard.Color = _ActiveDeck.GetRandomColor();
         }
@@ -589,7 +570,7 @@
             {
                 foreach (ConsoleColor color in _ActiveDeck.Colors)
                 {
-                    Utilities.WriteLineColor($"> {Utilities.GetColor(color)}", color);
+                    WriteLineColor($"> {Enum.GetName(typeof(ConsoleColor), color)}", color);
                 }
 
                 while (true)
@@ -600,7 +581,7 @@
                         _CurrentDiscard.Color = color;
                         break;
                     }
-                    Utilities.WriteLineColor("That is not a valid option!", ConsoleColor.Red);
+                    WriteLineColor("That is not a valid option!", ConsoleColor.Red);
                 }
             }
             else
@@ -618,13 +599,14 @@
             int target;
             if (_CurrentTurn == 0)
             {
-                for (int j = 1; j < _Players.Count; j++)
+                for (int j = 1; j < _PlayerList.Count; j++)
                 {
                     Console.WriteLine($"[{j}] Player {j}");
                 }
+
                 do
                 {
-                    target = Utilities.Prompt("Player to target: ", "That is not a valid option!");
+                    target = Prompt("Player to target: ", "That is not a valid option!");
                 }
                 while (target == _CurrentTurn);
             }
@@ -637,6 +619,30 @@
                 while (target == _CurrentTurn);
             }
             return target;
+        }
+
+        #endregion
+
+        #region // Utilities
+
+        public static void WriteLineColor(object o, ConsoleColor c)
+        {
+            Console.ForegroundColor = c;
+            Console.WriteLine(o);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static int Prompt(string prompt, string errorMessage)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                if (int.TryParse(Console.ReadLine(), out int outVar))
+                {
+                    return outVar;
+                }
+                WriteLineColor(errorMessage, ConsoleColor.Red);
+            }
         }
 
         #endregion
