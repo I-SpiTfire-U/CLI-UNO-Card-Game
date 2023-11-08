@@ -3,6 +3,7 @@
     public class Deck
     {
         public bool DisableWild { get; }
+        public bool DisableSpecial { get; }
         public string Name { get; }
         public ConsoleColor[] Colors { get; }
         public HashSet<string> Cards { get; }
@@ -10,13 +11,14 @@
 
         private readonly Random _Random = new();
 
-        public Deck(string name, HashSet<string> cards, HashSet<string> specialCards, ConsoleColor[] colors, bool disableWild)
+        public Deck(string name, HashSet<string> cards, HashSet<string> specialCards, ConsoleColor[] colors, bool disableWild, bool disableSpecial)
         {
             Name = name;
             Cards = cards;
             SpecialCards = specialCards;
             Colors = colors;
             DisableWild = disableWild;
+            DisableSpecial = disableSpecial;
         }
 
         public bool CheckIfSpecial(Card card)

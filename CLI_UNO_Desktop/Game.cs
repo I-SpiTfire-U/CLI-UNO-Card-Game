@@ -45,7 +45,7 @@
                 },
                 new HashSet<string>
                 { "wild", "wild +4", "wild shuffle" },
-                commonColors, false);
+                commonColors, false, false);
 
             Deck competitive = new Deck("Competitive",
                 new HashSet<string>
@@ -55,7 +55,7 @@
                 },
                 new HashSet<string>
                 { "wild", "wild shuffle", "self draw +2", "self draw +3" },
-                commonColors, false);
+                commonColors, false, false);
 
             Deck candy = new Deck("Candy",
                 new HashSet<string>
@@ -70,7 +70,7 @@
                     ConsoleColor.Red, ConsoleColor.Yellow,
                     ConsoleColor.Green, ConsoleColor.Blue,
                     ConsoleColor.Cyan, ConsoleColor.Magenta
-                }, false);
+                }, false, false);
 
             Deck chaos = new Deck("Chaos",
                 new HashSet<string>
@@ -87,7 +87,7 @@
                     ConsoleColor.Green, ConsoleColor.Blue,
                     ConsoleColor.Cyan, ConsoleColor.Magenta,
                     ConsoleColor.DarkRed, ConsoleColor.DarkYellow
-                }, false);
+                }, false, false);
 
             Deck allWild = new Deck("All Wild",
                 new HashSet<string>
@@ -95,7 +95,7 @@
                     "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild"
                 },
                 new HashSet<string> { "wild", "wild +2", "wild +4", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild" },
-                commonColors, false);
+                commonColors, true, true);
 
             Deck retro = new Deck("Retro",
                 new HashSet<string>
@@ -105,7 +105,7 @@
                 },
                 new HashSet<string> { },
                 new ConsoleColor[]
-                { ConsoleColor.Green, ConsoleColor.DarkGreen }, false);
+                { ConsoleColor.Green, ConsoleColor.DarkGreen }, false, false);
 
             return new Deck[] { standard, competitive, candy, chaos, allWild, retro };
         }
@@ -147,7 +147,7 @@
             {
                 _CurrentDiscard = _ActiveDeck.GetRandomCard();
             }
-            while (_ActiveDeck.CheckIfSpecial(_CurrentDiscard));
+            while (_ActiveDeck.CheckIfSpecial(_CurrentDiscard) && !_ActiveDeck.DisableSpecial);
         }
 
         #endregion
@@ -424,14 +424,14 @@
         /// <param name="card">The selected card</param>
         private static void HandleRegularActions(Card card)
         {
-            if (card.Type.Contains("reverse"))
-            {
-                _ReversePlayDirection = !_ReversePlayDirection;
-            }
-
             if (card.Type.Contains("wild") && !_ActiveDeck.DisableWild)
             {
                 ActionWild();
+            }
+
+            if (card.Type.Contains("reverse"))
+            {
+                _ReversePlayDirection = !_ReversePlayDirection;
             }
 
             if (card.Type.Contains("candy"))
