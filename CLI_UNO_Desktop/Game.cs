@@ -1,6 +1,6 @@
 ﻿namespace CLI_UNO_Desktop
 {
-    internal class Game
+    static class Game
     {
 #pragma warning disable CS8618
         private static Deck _ActiveDeck;
@@ -8,8 +8,8 @@
         private static int _NumberOfPlayers;
         private static int _CurrentTurn;
         private static Card _CurrentDiscard;
-        private static int _NextPlayerPickup = 0;
-        private static bool _ReversePlayDirection = false;
+        private static int _NextPlayerPickup;
+        private static bool _ReversePlayDirection;
         private static readonly Random _Random = new();
         private static readonly List<List<Card>> _PlayerList = new();
 
@@ -24,6 +24,12 @@
 
                 Console.Clear();
                 Console.WriteLine("\x1b[3J");
+                Console.WriteLine("Play again? [y/n]");
+                if (Console.ReadKey(true).Key == ConsoleKey.Y)
+                {
+                    continue;
+                }
+                return;
             }
         }
 
@@ -107,7 +113,7 @@
                 new ConsoleColor[]
                 { ConsoleColor.Green, ConsoleColor.DarkGreen }, false, false);
 
-            return new Deck[] { standard, competitive, candy, chaos, allWild, retro };
+            return new[] { standard, competitive, candy, chaos, allWild, retro };
         }
 
         /// <summary>
@@ -632,16 +638,16 @@
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static int Prompt(string prompt, string errorMessage)
+        public static int Prompt(string message, string error)
         {
             while (true)
             {
-                Console.Write(prompt);
+                Console.Write(message);
                 if (int.TryParse(Console.ReadLine(), out int outVar))
                 {
                     return outVar;
                 }
-                WriteLineColor(errorMessage, ConsoleColor.Red);
+                WriteLineColor(error, ConsoleColor.Red);
             }
         }
 
