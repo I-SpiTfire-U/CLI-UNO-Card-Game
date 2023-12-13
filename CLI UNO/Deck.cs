@@ -1,4 +1,4 @@
-﻿namespace CLI_UNO_Desktop
+﻿namespace CLI_UNO
 {
     public class Deck
     {

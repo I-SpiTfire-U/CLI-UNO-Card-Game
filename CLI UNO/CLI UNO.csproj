@@ -8,10 +8,11 @@
 		<Nullable>enable</Nullable>
 		<PublishAot>true</PublishAot>
 		<InvariantGlobalization>true</InvariantGlobalization>
+		<ApplicationIcon>CLI UNO.ico</ApplicationIcon>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="CLI_UNO.ico" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Content Include="CLI UNO.ico" />
+	</ItemGroup>
 
 </Project>
