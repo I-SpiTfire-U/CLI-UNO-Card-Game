@@ -41,7 +41,7 @@
         /// <returns>An array with each deck</returns>
         private static Deck[] CreateDecks()
         {
-            ConsoleColor[] commonColors = new ConsoleColor[] { ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Blue };
+            ConsoleColor[] commonColors = [ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Blue];
 
             Deck standard = new Deck("Standard",
                 new HashSet<string>
@@ -71,12 +71,11 @@
                 },
                 new HashSet<string>
                 { "wild", "wild +4", "candy" },
-                new ConsoleColor[]
-                {
+                [
                     ConsoleColor.Red, ConsoleColor.Yellow,
                     ConsoleColor.Green, ConsoleColor.Blue,
                     ConsoleColor.Cyan, ConsoleColor.Magenta
-                }, false, false);
+                ], false, false);
 
             Deck chaos = new Deck("Chaos",
                 new HashSet<string>
@@ -87,13 +86,12 @@
                 },
                 new HashSet<string>
                 { "wild", "wild +2", "wild +4", "wild +8", "reverse wild", "skip wild", "skip wild x2", "target wild +2", "swap wild", "candy" },
-                new ConsoleColor[]
-                {
+                [
                     ConsoleColor.Red, ConsoleColor.Yellow,
                     ConsoleColor.Green, ConsoleColor.Blue,
                     ConsoleColor.Cyan, ConsoleColor.Magenta,
                     ConsoleColor.DarkRed, ConsoleColor.DarkYellow
-                }, false, false);
+                ], false, false);
 
             Deck allWild = new Deck("All Wild",
                 new HashSet<string>
@@ -110,10 +108,9 @@
                     "skip", "reverse", "draw +2", "wild", "wild +4", "wild shuffle"
                 },
                 new HashSet<string> { },
-                new ConsoleColor[]
-                { ConsoleColor.Green, ConsoleColor.DarkGreen }, false, false);
+                [ConsoleColor.Green, ConsoleColor.DarkGreen], false, false);
 
-            return new[] { standard, competitive, candy, chaos, allWild, retro };
+            return [standard, competitive, candy, chaos, allWild, retro];
         }
 
         /// <summary>
@@ -183,11 +180,9 @@
                 if (_CurrentTurn == 0)
                 {
                     PlayerTurn();
+                    continue;
                 }
-                else
-                {
-                    BotTurn();
-                }
+                BotTurn();
             }
         }
 
@@ -223,7 +218,7 @@
             {
                 _CurrentTurn = (_CurrentTurn + _NumberOfPlayers) % _NumberOfPlayers;
             }
-            if (_CurrentTurn >= _NumberOfPlayers)
+            else if (_CurrentTurn >= _NumberOfPlayers)
             {
                 _CurrentTurn = (_CurrentTurn - _NumberOfPlayers) % _NumberOfPlayers;
             }
@@ -572,27 +567,26 @@
         /// </summary>
         private static void ActionWild()
         {
-            if (_CurrentTurn == 0)
-            {
-                foreach (ConsoleColor color in _ActiveDeck.Colors)
-                {
-                    WriteLineColor($"> {Enum.GetName(typeof(ConsoleColor), color)}", color);
-                }
-
-                while (true)
-                {
-                    Console.Write("Choose Color: ");
-                    if (Enum.TryParse(Console.ReadLine(), true, out ConsoleColor color))
-                    {
-                        _CurrentDiscard.Color = color;
-                        break;
-                    }
-                    WriteLineColor("That is not a valid option!", ConsoleColor.Red);
-                }
-            }
-            else
+            if (_CurrentTurn != 0)
             {
                 _CurrentDiscard.Color = _ActiveDeck.GetRandomColor();
+                return;
+            }
+
+            foreach (ConsoleColor color in _ActiveDeck.Colors)
+            {
+                WriteLineColor($"> {Enum.GetName(typeof(ConsoleColor), color)}", color);
+            }
+
+            while (true)
+            {
+                Console.Write("Choose Color: ");
+                if (Enum.TryParse(Console.ReadLine(), true, out ConsoleColor color))
+                {
+                    _CurrentDiscard.Color = color;
+                    break;
+                }
+                WriteLineColor("That is not a valid option!", ConsoleColor.Red);
             }
         }
 
