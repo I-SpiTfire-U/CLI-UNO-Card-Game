@@ -332,7 +332,7 @@
         /// </summary>
         private static void BotTurn()
         {
-            Thread.Sleep(2500);
+            Thread.Sleep(1500);
 
             ShuffleBotHand(_PlayerList[_CurrentTurn]);
 

@@ -1,6 +1,6 @@
 ﻿namespace CLI_UNO
 {
-    public struct Card : IEquatable<Card>
+    public struct Card
     {
         public string Type { get; }
         public ConsoleColor Color { get; set; }
@@ -9,11 +9,6 @@
         {
             Color = color;
             Type = type;
-        }
-
-        public bool Equals(Card other)
-        {
-            throw new NotImplementedException();
         }
     }
 }
